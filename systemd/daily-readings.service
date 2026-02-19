@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Scripture Readings Nostr Post
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/nostr-bot/keys.env
+ExecStart=/bin/sh -c 'python3 %h/git/personal/daily_readings_bot/bot.py | python3 %h/git/personal/nostr_post.py'
+StandardOutput=journal
+StandardError=journal
