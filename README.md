@@ -17,17 +17,19 @@ Each post is signed with a Nostr private key and broadcast to multiple public re
 
 ```bash
 # Saint post
-python3 ~/git/personal/daily_saint_bot/bot.py | NOSTR_NSEC=nsec1... python3 nostr_post.py
+~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py | \
+  NOSTR_NSEC=nsec1... .venv/bin/python nostr_post.py
 
 # Readings post
-python3 ~/git/personal/daily_readings_bot/bot.py | NOSTR_NSEC=nsec1... python3 nostr_post.py
+~/git/personal/daily_readings_bot/.venv/bin/python ~/git/personal/daily_readings_bot/bot.py | \
+  NOSTR_NSEC=nsec1... .venv/bin/python nostr_post.py
 ```
 
 Or load the key from the saved env file:
 
 ```bash
-python3 ~/git/personal/daily_saint_bot/bot.py | \
-  env $(cat ~/.config/nostr-bot/keys.env) python3 nostr_post.py
+~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py | \
+  env $(cat ~/.config/nostr-bot/keys.env) .venv/bin/python nostr_post.py
 ```
 
 ### Check scheduled posts
@@ -43,16 +45,18 @@ journalctl --user -u daily-readings.service
 ### 1. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 ```
 
 ### 2. Clone the content bots
 
 ```bash
 git clone https://github.com/daomah/daily_saint_bot ~/git/personal/daily_saint_bot
+cd ~/git/personal/daily_saint_bot && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
 git clone https://github.com/daomah/daily_readings_bot ~/git/personal/daily_readings_bot
-pip install -r ~/git/personal/daily_saint_bot/requirements.txt
-pip install -r ~/git/personal/daily_readings_bot/requirements.txt
+cd ~/git/personal/daily_readings_bot && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 
 ### 3. Generate a Nostr keypair
@@ -64,6 +68,8 @@ python3 keygen.py
 This creates `~/.config/nostr-bot/keys.env` containing your `NOSTR_NSEC`. Back up the nsec securely — it cannot be recovered if lost. Share only your npub (public key).
 
 ### 4. Install the systemd user units
+
+The service files assume the repos are cloned under `~/git/personal/`. If you used a different location, edit the `ExecStart` lines in `systemd/daily-saint.service` and `systemd/daily-readings.service` before copying.
 
 ```bash
 mkdir -p ~/.config/systemd/user
@@ -82,12 +88,11 @@ loginctl enable-linger $USER
 
 ### nostr_post.py
 
-Reads content from stdin, signs it as a Nostr kind-1 text note using the private key in `NOSTR_NSEC`, and broadcasts it to four public relays:
+Reads content from stdin, signs it as a Nostr kind-1 text note using the private key in `NOSTR_NSEC`, and broadcasts it to public relays:
 
 - `wss://relay.damus.io`
 - `wss://nos.lol`
-- `wss://relay.nostr.band`
-- `wss://nostr.wine`
+- `wss://nostr.wine` (requires a free account at nostr.wine to write)
 
 ### systemd units
 

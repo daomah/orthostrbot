@@ -6,6 +6,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 EnvironmentFile=%h/.config/nostr-bot/keys.env
+# Edit the paths below if you cloned the repos somewhere other than ~/git/personal/
 ExecStart=/bin/sh -c '%h/git/personal/daily_readings_bot/.venv/bin/python %h/git/personal/daily_readings_bot/bot.py | %h/git/personal/orthostrbot/.venv/bin/python %h/git/personal/orthostrbot/nostr_post.py'
 StandardOutput=journal
 StandardError=journal
