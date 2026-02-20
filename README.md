@@ -4,10 +4,11 @@ Publishes daily Orthodox Christian content to [Nostr](https://nostr.com) — the
 
 ## What it does
 
-Two posts go out each day:
+Three posts go out each day:
 
 1. **6:00 AM** — the top saint of the day (name, icon, troparion, kontakion), sourced via [daily_saint_bot](https://github.com/daomah/daily_saint_bot)
 2. **9:00 AM** — the full scripture readings for the day (Epistle, Gospel, and all other types), sourced via [daily_readings_bot](https://github.com/daomah/daily_readings_bot)
+3. **4:00 PM** — a randomly selected lesser-commemorated saint of the day, sourced via [daily_saint_bot](https://github.com/daomah/daily_saint_bot) `--random`
 
 Each post is signed with a Nostr private key and broadcast to multiple public relays.
 
@@ -16,8 +17,12 @@ Each post is signed with a Nostr private key and broadcast to multiple public re
 ### Post manually
 
 ```bash
-# Saint post
+# Top saint post
 ~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py | \
+  NOSTR_NSEC=nsec1... .venv/bin/python nostr_post.py
+
+# Random saint post
+~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py --random | \
   NOSTR_NSEC=nsec1... .venv/bin/python nostr_post.py
 
 # Readings post
@@ -28,7 +33,7 @@ Each post is signed with a Nostr private key and broadcast to multiple public re
 Or load the key from the saved env file:
 
 ```bash
-~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py | \
+~/git/personal/daily_saint_bot/.venv/bin/python ~/git/personal/daily_saint_bot/bot.py --random | \
   env $(cat ~/.config/nostr-bot/keys.env) .venv/bin/python nostr_post.py
 ```
 
@@ -37,6 +42,7 @@ Or load the key from the saved env file:
 ```bash
 systemctl --user list-timers
 journalctl --user -u daily-saint.service
+journalctl --user -u daily-saint-random.service
 journalctl --user -u daily-readings.service
 ```
 
@@ -69,13 +75,13 @@ This creates `~/.config/nostr-bot/keys.env` containing your `NOSTR_NSEC`. Back u
 
 ### 4. Install the systemd user units
 
-The service files assume the repos are cloned under `~/git/personal/`. If you used a different location, edit the `ExecStart` lines in `systemd/daily-saint.service` and `systemd/daily-readings.service` before copying.
+The service files assume the repos are cloned under `~/git/personal/`. If you used a different location, edit the `ExecStart` lines in the `.service` files before copying.
 
 ```bash
 mkdir -p ~/.config/systemd/user
 cp systemd/*.service systemd/*.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user enable --now daily-saint.timer daily-readings.timer
+systemctl --user enable --now daily-saint.timer daily-saint-random.timer daily-readings.timer
 ```
 
 ### 5. Allow posts to run without an active login session
@@ -96,7 +102,7 @@ Reads content from stdin, signs it as a Nostr kind-1 text note using the private
 
 ### systemd units
 
-Two `.service` / `.timer` pairs run as user-level systemd units. Each service pipes a content bot's stdout directly into `nostr_post.py`. `Persistent=true` on the timers ensures a missed post fires on next boot.
+Three `.service` / `.timer` pairs run as user-level systemd units. Each service pipes a content bot's stdout directly into `nostr_post.py`. `Persistent=true` on the timers ensures a missed post fires on next boot.
 
 ### keygen.py
 

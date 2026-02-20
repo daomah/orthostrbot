@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily Random Orthodox Saint Nostr Post Timer
+
+[Timer]
+OnCalendar=*-*-* 16:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
