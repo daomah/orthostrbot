@@ -1,8 +1,8 @@
-# orthostrbot
+# ✝️ orthostrbot
 
 Publishes daily Orthodox Christian content to [Nostr](https://nostr.com) — the saint of the day and the scripture readings — on a scheduled basis using systemd timers.
 
-## What it does
+## 📋 What it does
 
 Three posts go out each day:
 
@@ -12,7 +12,7 @@ Three posts go out each day:
 
 Each post is signed with a Nostr private key and broadcast to multiple public relays.
 
-## Usage
+## 💻 Usage
 
 ### Post manually
 
@@ -46,7 +46,7 @@ journalctl --user -u daily-saint-random.service
 journalctl --user -u daily-readings.service
 ```
 
-## Setup
+## ⚙️ Setup
 
 ### 1. Install dependencies
 
@@ -90,7 +90,7 @@ systemctl --user enable --now daily-saint.timer daily-saint-random.timer daily-r
 loginctl enable-linger $USER
 ```
 
-## How it works
+## ⚙️ How it works
 
 ### nostr_post.py
 
@@ -108,7 +108,7 @@ Three `.service` / `.timer` pairs run as user-level systemd units. Each service 
 
 One-time utility that generates a fresh secp256k1 keypair, prints the bech32-encoded npub and nsec, and saves the nsec to `~/.config/nostr-bot/keys.env` with mode 600.
 
-## Resources
+## 📚 Resources
 
 | Resource | URL |
 |---|---|
@@ -117,6 +117,6 @@ One-time utility that generates a fresh secp256k1 keypair, prints the bech32-enc
 | daily_saint_bot | https://github.com/daomah/daily_saint_bot |
 | daily_readings_bot | https://github.com/daomah/daily_readings_bot |
 
-## License
+## 📄 License
 
 The **code** in this repository is released under the [MIT License](LICENSE).
